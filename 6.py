@@ -1,8 +1,8 @@
-import RPI.GPIO as GPIO
-import myplotlib.pyplot as plt
+import RPi.GPIO as GPIO
+import matplotlib.pyplot as plt
 import time
 
-leds = []
+leds = [21, 20, 16, 12, 7, 8, 25, 24]
 dac = [26, 19, 13, 6, 5, 11, 9, 10]
 comp = 4
 troyka = 17
@@ -24,7 +24,7 @@ def adc() :
     while i < 256 :
         GPIO.output(dac, decimal2binary(i))
         i+= 1
-        time.sleep(0.01)
+        time.sleep(0.001)
         compValue = GPIO.input(comp)
         if compValue == 0 :
             break
@@ -35,27 +35,41 @@ try:
     begin = time.time()
     while True :
         znachenie = adc()
-        voltage = znachenie * 3.3 / 256
         measured_data.append(znachenie)
         GPIO.output(leds, decimal2binary(znachenie))
-        if znachenie >= 255 :
-            GPIO.output(troyka, 0)
-        if znachenie == 0 :
+        if znachenie >= 253 :
+            break
+    GPIO.output(troyka, 0)
+    while True :
+        znachenie = adc()
+        measured_data.append(znachenie)
+        GPIO.output(leds, decimal2binary(znachenie))
+        if znachenie == 5 :
             end = time.time()
             break
     lasting = end - begin
+
+    v = len(measured_data) / lasting
+    period = lasting / len(measured_data)
+    quant = measured_data[2] - measured_data[1]
     plt.plot(measured_data)
-    plt.show
-
+    plt.show()
+    
     measured_data_str = [str(item) for item in measured_data]
-    print(measured_data, measured_data_str)
-
+    v_str = str(v)
+    quant_str = str(quant)
     with open("data.txt", "w") as outfile :
-    outfile.write("\n".join(measured_data_str))
+        outfile.write("\n".join(measured_data_str))
+
+    with open("settings.txt", "w") as outfile1 :
+        outfile1.write("\n".join(quant_str))
+        outfile1.write("\n".join(v_str))
+    print("Продолжительность эксперимента: ", lasting, ",период: ", period, ", частота:", v) 
         
 finally:
     GPIO.output(dac, 0)
     GPIO.output(troyka, 0)
+    GPIO.output(leds, 0)
     GPIO.cleanup()
 
 
