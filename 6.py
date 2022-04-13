@@ -36,7 +36,7 @@ try:
     while True :
         znachenie = adc()
         voltage = znachenie * 3.3 / 256
-        measured_data.append(voltage)
+        measured_data.append(znachenie)
         GPIO.output(leds, decimal2binary(znachenie))
         if znachenie >= 255 :
             GPIO.output(troyka, 0)
