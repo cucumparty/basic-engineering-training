@@ -1,4 +1,4 @@
-import RPI.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 dac = [26, 19, 13, 6, 5, 11, 9, 10]
 
@@ -14,8 +14,9 @@ try:
         if ( a == "q") :
             break
         a = int(a)
-        if ( a > 255 and a < 0 ) :
+        if ( a > 255 or a < 0 ) :
             print ("Некорректное значение")
+            break
         GPIO.output(dac, decimal2binary(a))
         voltage = a / 255 * 3.3
         print (voltage)
