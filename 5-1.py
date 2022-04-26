@@ -1,4 +1,4 @@
-import RPI.GPIO as GPIO
+import RPi.GPIO as GPIO
 import time
 
 dac = [26, 19, 13, 6, 5, 11, 9, 10]
@@ -17,11 +17,11 @@ def adc() :
     i = 0
     while i < 256 :
         GPIO.output(dac, decimal2binary(i))
-        i+= 1
         time.sleep(0.01)
         compValue = GPIO.input(comp)
         if compValue == 0 :
             break
+        i+= 1
     return i
 
 try:
